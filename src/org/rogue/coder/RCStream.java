@@ -1,6 +1,7 @@
 package org.rogue.coder;
 
 import java.util.*;
+import java.util.function.IntBinaryOperator;
 
 /**
  * Created by RogueCoder on 1/12/2017.
@@ -14,60 +15,19 @@ public class RCStream {
                 new String[]{"Rogue", "Coder", "Was", "Here"}
         );
 
-        //List of our test POJO's
-        List<RCPojo> pojoList = Arrays.asList(
-                new RCPojo[]{
-                        new RCPojo("one","two", 2),
-                        new RCPojo("three", "four", 4)
-                }
-        );
-
-        //if just doing forEach, we don't need a stream()
-        stringList.forEach(string->
-            //print it!
-            System.out.println(string)
-        );//look Ma, no curly brackets!
-
         //use a pipeline to filter out null values
         stringList.stream()
                 .filter(string -> null != string)
                 .forEach(string -> System.out.println(string));
 
-        //just a boolean property, nothing to see here
-        boolean myBoolean = false;
-
-        //More than one operation, so let's add some curly brackets
-        pojoList.forEach(pojo->{
-            //print our pojo out to system
-            System.out.println(pojo.toString());
-
-            //modify the bar property
-            setBarValue(pojo);
-
-            /*
-            //OOPS! can't set myBoolean in the stream!
-            if(null != pojo.getBar())
-                myBoolean = true;
-            */
-        });
-
-        //Initialize a new HashMap
-        Map<String, Integer> map = new HashMap<>(2);
-        map.put("foo",1);
-        map.put("bar",2);
-
-        //print out our map keys and values
-        map.forEach((k,v)->
-            System.out.println("The value of: " + k + " is: " + v)
+        //List of RCPojo's
+        List<RCPojo> pojoList = Arrays.asList(
+                new RCPojo[]{
+                        new RCPojo("one","two", 2),
+                        new RCPojo("three", "four", 4),
+                        new RCPojo("five", "six", 6)
+                }
         );
-
-        //let's stream our map values then sum our values!
-        int total = map
-                .values()
-                .stream()
-                .mapToInt(i->i)
-                .sum();
-        System.out.println("Total: " + total);
 
         //find the average of our val property in the RCPojo List
         double avg = pojoList
@@ -77,14 +37,52 @@ public class RCStream {
                 .getAsDouble();
         System.out.println("Average: " + avg);
 
+        //Initialize a new HashMap
+        Map<String, Integer> map = new HashMap<>(2);
+        map.put("foo",1);
+        map.put("bar",2);
+
+        //let's stream our map values then sum our values!
+        int total = map
+                .values()
+                .stream()
+                .mapToInt(i->i)
+                .sum();
+        System.out.println("Total: " + total);
+
         //old way :(
         int oldWayTotal = 0;
-        for(int v: map.values())
+        for(int v: map.values()) {
             oldWayTotal += v;
+        }
         System.out.println("Old Way Total: " + total);
+
+        //use stream to find distinct values
+        pojoList
+                .stream()
+                .mapToInt(RCPojo::getVal)
+                .distinct()
+                .forEach(i->
+                    System.out.println("Distinct i: " + i)
+                );
+
+        int reduced = pojoList
+                .stream()
+                .mapToInt(RCPojo::getVal)
+                .reduce((i, j) -> i+j)
+                .getAsInt();
+
+        System.out.println("Reduce: " + reduced);
+
+        //here we are checking to see if any of the values are less than 6
+        boolean anyLessThan6 = pojoList
+                .stream()
+                .mapToInt(RCPojo::getVal)
+                .anyMatch(i -> i < 6);
+        //you can also do allMatch(...)
+
+        assert(anyLessThan6 == true);
+
     }
 
-    public static void setBarValue(RCPojo pojo){
-        pojo.setBar(pojo.getBar().concat("!"));
-    }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Created by Nathan on 1/17/2017.
+ * Created by RogueCoder on 1/17/2017.
  */
 public class RCOptional {
 
